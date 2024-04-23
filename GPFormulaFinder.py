@@ -5,21 +5,17 @@ from gplearn.genetic import SymbolicRegressor
 import json
 import math
 
-# Sampled inputs and outputs stored in a list of lists
 def main():
     with open('testdata.txt', 'r') as file:
-        # Read the content of the file
         dat = file.read()
-        # Parse the JSON data into a Python list
         data = json.loads(dat)
-        # Convert the list of lists to NumPy array for easier manipulation
+        # NumPy array 
         data = np.array(data)
 
-    # Split features and output
     X = data[:, :-1]  # Features
     y = data[:, -1]   # Output
 
-    # Define the symbolic regression model
+    #symbolic regression model
     function_set = ['add', 'sub', 'mul', 'div', 'sqrt', 'log']
     est_gp = SymbolicRegressor(population_size=1000,
                                generations=1000, stopping_criteria=0.01,
@@ -31,7 +27,6 @@ def main():
                                max_samples=0.9, verbose=1,
                                parsimony_coefficient=0.01, random_state=0)
 
-    # Fit the model
     est_gp.fit(X, y)
 
     converter = {
@@ -48,12 +43,10 @@ def main():
         'pow3': lambda x: x**3
     }
 
-    # Extract and print the best symbolic expression found
     sympy_expression = sympify(str(est_gp._program), locals=converter)
     print("Best symbolic expression found:")
     print(sympy_expression)
 
-    # Create a callable function from the expression
     predict_func = lambdify([symbols('x' + str(i)) for i in range(X.shape[1])], sympy_expression)
 
     # Sample output predictions
